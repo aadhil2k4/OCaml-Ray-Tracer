@@ -1,2 +1,5 @@
-(test
- (name test_tracer))
+(library
+ (name rays_test)
+ (inline_tests)
+ (preprocess (pps ppx_expect))
+)
