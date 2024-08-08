@@ -45,3 +45,31 @@ module Image = struct
       F.fprintf fmt "\n"
     done
 end
+
+module Vec3d = struct
+  type t = float * float * float
+
+  let ( + ) (v11, v12, v13) (v21, v22, v23)  =
+    (v11 +. v21, v12 +. v22, v13 +. v23)
+  let ( - ) (v11, v12, v13) (v21, v22, v23)  =
+    (v11 -. v21, v12 -. v22, v13 -. v23)
+    let ( * ) a (v1, v2, v3) = (a *. v1, a *. v2, a *. v3)
+    let ( / ) (v1 ,v2, v3) a = (v1 /. a, v2  /. a, v3 /. a)
+  let length_squared (v1, v2, v3) = (v1 *. v1) +. (v2 *. v2) +. (v3 *. v3)
+  let length v = sqrt (length_squared v)
+end
+
+module Point3d = Vec3d
+
+module Color = struct
+include Vec3d
+  let to_pixel t =
+    let factor = 255.99 in
+    let r, g, b = factor * t in
+    Pixel.create (int_of_float r, int_of_float g, int_of_float b)
+end
+
+module Ray = struct
+  type t = {origin: Point3d.t; dir: Vec3d.t}
+  let at scale {origin; dir} = Vec3d.(origin + (scale * dir))
+end
