@@ -1,4 +1,4 @@
 (executable
- (public_name tracer)
+ (public_name rays)
  (name main)
- (libraries tracer))
+ (libraries rays))
