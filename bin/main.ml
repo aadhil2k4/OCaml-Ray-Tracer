@@ -1,6 +1,6 @@
 open Rays
 
-let sample_image () =
+let _sample_image () =
   let image_width = 256 in
   let image_height = 256 in
   let render ~row ~col = 
@@ -14,6 +14,8 @@ let sample_image () =
     Pixel.create (r, g, b)
   in
   Image.create ~height:image_height ~width:image_width ~f:render
+
+let ray_color _ray = (0., 0.,0.)
 
 let raytraced_image () =
   let aspect_ratio = 16.0 /. 9.0 in
@@ -37,17 +39,20 @@ let raytraced_image () =
   let viewport_upper_left = Vec3d.(camera_center - (0., 0., focal_length) - viewport_lr / (float_of_int 2)
   - (viewport_td /! 2))
 in
+  let pixel00_loc = Vec3d.(viewport_upper_left + (0.5*(pixel_delta_lr + pixel_delta_td))) in
+let render ~row ~col = 
+  let pixel_center = Vec3d.(pixel00_loc + (col *! pixel_delta_lr) + (row *! pixel_delta_td)) in
+  let ray_direction = Vec3d.(pixel_center - camera_center) in
+  let ray = Ray.{origin= camera_center; dir= ray_direction} in
+  let color = ray_color ray in
+  Color.to_pixel color
+in
   (*Image Creation*)
-    Image.create ~height: image_height ~width: image_width ~f:(fun ~row ~col -> Pixel.create (row, col, 0))
+    Image.create ~height: image_height ~width: image_width ~f:render 
 
 let () =
-  let oc = Out_channel.open_text "sample.ppm" in
-  try
-    let fmt = Format.formatter_of_out_channel oc in
-    let img = sample_image () in 
-    Format.fprintf fmt "%a" Image.pp_ppm img;
-    Format.printf "Image generated\n";
-    Out_channel.close oc
-  with ex ->
-    Format.eprintf "%s" (Printexc.to_string ex);
-    Out_channel.close_noerr oc
+    let img = raytraced_image() in
+    Out_channel.with_open_text "sample.ppm" (fun oc->
+      let fmt = Format.formatter_of_out_channel oc in
+      Format.fprintf fmt "%a" Image.pp_ppm img);
+    Format.printf "Image generated successfully\n"
