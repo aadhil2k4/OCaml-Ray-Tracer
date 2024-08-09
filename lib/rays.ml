@@ -65,6 +65,8 @@ module Vec3d = struct
     (v1 /. a, v2 /. a, v3 /. a)
   let length_squared (v1, v2, v3) = (v1 *. v1) +. (v2 *. v2) +. (v3 *. v3)
   let length v = sqrt (length_squared v)
+
+  let unit v = v / length v
 end
 
 module Point3d = Vec3d

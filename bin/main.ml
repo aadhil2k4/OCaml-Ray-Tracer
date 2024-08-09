@@ -15,7 +15,10 @@ let _sample_image () =
   in
   Image.create ~height:image_height ~width:image_width ~f:render
 
-let ray_color _ray = (0., 0.,0.)
+let ray_color Ray.{dir; _} = 
+  let (_, y, _) = Vec3d.unit dir in
+  let blend_factor = 0.5 *. (y +. 1.0) in
+  Color.(((1. -. blend_factor)*(1., 1., 1.))+(blend_factor*(0.5, 0.7,1.0)))
 
 let raytraced_image () =
   let aspect_ratio = 16.0 /. 9.0 in
